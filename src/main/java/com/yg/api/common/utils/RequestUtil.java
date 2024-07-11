@@ -1,13 +1,10 @@
 package com.yg.api.common.utils;
 
+import com.alibaba.fastjson.JSONObject;
+import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.junit.platform.commons.logging.LoggerFactory;
-
-import java.util.Map;
-import java.util.logging.Logger;
-
-import static io.restassured.RestAssured.given;
+import org.testng.annotations.Test;
 
 /**
  * @author: Flora
@@ -20,21 +17,30 @@ public class RequestUtil {
     /**
      * 发送通用的POST请求
      *
-     * @param endpoint    API端点
-     * @param headers     请求头
+     * @param url 请求地址
+     * @param cookie cookie
      * @param requestBody 请求体
      * @return 响应
      */
-    public Response sendPostRequest(String endpoint, Map<String, String> headers, String requestBody) {
-        // 创建请求规范
-        RequestSpecification request = given();
+    public static Response PostRequest(String url, JSONObject requestBody) {
+        System.out.println("请求："+requestBody.toJSONString());
+        RequestSpecification request = RestAssured.given()
+                .header("Content-Type", "application/json; charset=UTF-8")
+                .body(requestBody.toJSONString());
 
-        // 设置请求头
-        if (headers != null) {
-            headers.forEach(request::header);
-        }
+        return request.post(url);
+    }
 
-        // 发送POST请求并返回响应
-        return request.body(requestBody).post(endpoint);
+    @Test
+    public void test() {
+        String url = "https://api.erp321.com/erp/webapi/UserApi/WebLogin/Passport";
+        JSONObject body = new JSONObject();
+        JSONObject data = new JSONObject();
+        body.put("data",data);
+        data.put("account","wms@yg.com");
+        data.put("password","yaoguang20@@");
+        Response response = RequestUtil.PostRequest(url, body);
+        System.out.println(response.getBody().asString());
+        // response.getBody().asString();
     }
 }

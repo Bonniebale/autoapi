@@ -16,13 +16,14 @@
     <description>Demo project for Spring Boot</description>
 
     <properties>
-<!--        <java.version>22</java.version>-->
-        <testng.version>7.4.0</testng.version>
+        <!--        <java.version>22</java.version>-->
+        <testng.version>7.7.0</testng.version>
         <rest-assured.version>5.3.0</rest-assured.version>
         <fastjson.version>2.0.47</fastjson.version>
         <junit.version>5.10.2</junit.version>
         <allure.version>2.24.0</allure.version>
         <Log4j2.version>2.20.0</Log4j2.version>
+        <spring-test.version>6.0.9</spring-test.version>
     </properties>
 
     <dependencies>
@@ -57,6 +58,14 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>${testng.version}</version>
+        </dependency>
+
+        <!-- Spring TestNG support -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring-test.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!--rest-assured-->
