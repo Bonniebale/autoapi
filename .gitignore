@@ -31,3 +31,19 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Applications
+*.app
+*.exe
+*.war
+
+# Large media files
+*.mp4
+*.tiff
+*.avi
+*.flv
+*.mov
+*.wmv
+
+src/main/resources/application.yml
+
