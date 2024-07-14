@@ -1,0 +1,41 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="TestSuiteName" parallel="false">
+
+    <!-- 配置测试的参数和数据提供者 -->
+<!--    <parameter name="username" value="testuser"/>-->
+<!--    <parameter name="password" value="testpassword"/>-->
+
+    <test name="ApiTests">
+        <!--执行指定包下的测试类-->
+        <packages>
+            <package name="com.yg.api.testcase.*"/>
+        </packages>
+    </test>
+
+<!--    <test name="TestCaseName1" preserve-order="true">-->
+<!--        &lt;!&ndash; 配置测试类 &ndash;&gt;-->
+<!--        <classes>-->
+<!--            <class name="com.yg.api.testcase.TestCase"/>-->
+<!--        </classes>-->
+<!--    </test>-->
+
+<!--    <test name="TestCaseName2">-->
+<!--        &lt;!&ndash; 配置测试类和测试方法 &ndash;&gt;-->
+<!--        <classes>-->
+<!--            <class name="com.example.tests.TestCase2">-->
+<!--                <methods>-->
+<!--                    <include name="testMethod1"/>-->
+<!--                    <include name="testMethod2"/>-->
+<!--                </methods>-->
+<!--            </class>-->
+<!--        </classes>-->
+<!--    </test>-->
+
+    <!-- 可以添加更多的 <test> 元素来定义其他测试 -->
+
+    <!-- 配置监听器 -->
+<!--    <listeners>-->
+<!--        <listener class-name="com.example.tests.TestListener"/>-->
+<!--    </listeners>-->
+
+</suite>

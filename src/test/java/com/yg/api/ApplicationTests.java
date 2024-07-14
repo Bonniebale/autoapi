@@ -1,26 +1,20 @@
 package com.yg.api;
 
-import org.junit.jupiter.api.Test;
+// import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.Test;
 
+
+// @Component
 @SpringBootTest(
         classes = Application.class,
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT
 )
-class ApplicationTests {
+public class ApplicationTests extends AbstractTestNGSpringContextTests {
 
-    @Value("${base_url.erp}")
-    public String erpUrl;
-
-    @Value("${base_url.api}")
-    public String apiUrl;
-
-    @Value("${base_url.api_web}")
-    public String apiWebUrl;
-
-    @Value("${base_url.open_old}")
-    public String openUrl;
 
     @Value("${account.base_username}")
     protected String baseUser;
@@ -28,8 +22,21 @@ class ApplicationTests {
     @Value("${account.base_password}")
     protected String basePassword;
 
+    @Value("${account.batch_user}")
+    protected String batchUser;
+
+    @Value("${account.non_refined_user}")
+    protected String nonReUser;
+
+    @Value("${account.third_party_warehouse}")
+    protected String thirdUser;
+
+    @Value("${account.third_party_warehouse_v2}")
+    protected String thirdUserV2;
+
     @Test
     void contextLoads() {
+        System.out.println(baseUser);
     }
 
 }

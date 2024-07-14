@@ -1,9 +1,10 @@
 package com.yg.api.common.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import com.yg.api.service.UserService;
-import io.restassured.path.json.JsonPath;
-import jakarta.annotation.Resource;
+import com.yg.api.common.BaseInfo;
+import com.yg.api.common.constant.ApiConstant;
+
+import java.util.Map;
 
 /**
  * @ClassName CookieUtil
@@ -11,19 +12,40 @@ import jakarta.annotation.Resource;
  * @Author Flora
  * @Date 2024/7/12 13:55
  */
-public class CookieUtil {
-    @Resource
-    UserService userService;
 
-    public static String formatCookie(JSONObject cookies) {
+public class CookieUtil {
+    // public static final ThreadLocal<Map<String, String>> cookie = new ThreadLocal<>();
+    // public static Map<String, String> cookie = null;
+    public static final ThreadLocal<String> cookie = new ThreadLocal<>();
+    public static String cookieString = null;
+
+
+    public static String formatCookie(Map<String, String> cookies) {
         return cookies.entrySet().stream()
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
                 .reduce((cookie1, cookie2) -> cookie1 + "; " + cookie2)
                 .orElse("");
     }
 
-    public String getCookie(String username, String password) {
-        JsonPath login = userService.login(username, password);
-        return formatCookie(login.getJsonObject("cookie"));
+    // public static String getCookie111(String username, String password) {
+    //     UserApiService userApiService = new UserApiService();
+    //     var cookies = userApiService.login(username, password).getCookies();
+    //
+    //     String cookieStr = CookieUtil.formatCookie(cookies);
+    //     cookie.set(cookieStr);
+    //     return cookieStr;
+    // }
+
+    public static void getCookie(String username, String password) {
+        JSONObject body = new JSONObject();
+        JSONObject data = new JSONObject();
+        body.put("data", data);
+        data.put("account", username);
+        data.put("password", password);
+
+        var cookies = RequestUtil.doPost(BaseInfo.API_URL + ApiConstant.LOGIN_API, body).getCookies();
+        CookieUtil.cookieString = CookieUtil.formatCookie(cookies);
     }
+
+
 }
