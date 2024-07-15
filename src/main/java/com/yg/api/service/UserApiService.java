@@ -1,6 +1,6 @@
 package com.yg.api.service;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.yg.api.common.BaseInfo;
 import com.yg.api.common.constant.ApiConstant;
 import com.yg.api.common.utils.RequestUtil;
