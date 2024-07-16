@@ -28,7 +28,7 @@ public class ResponseDataHandler {
         if (data == null || data.isEmpty()) {
             throw new IllegalArgumentException("Response data is empty.");
         }
-        JSONObject outerJson = JSON.parseObject(splitWith01(data));
+        JSONObject outerJson = JSON.parseObject(data);
         String returnValue = outerJson.getString("ReturnValue");
         // 解析 ReturnValue 字段的 JSON 字符串
         try {
@@ -46,6 +46,15 @@ public class ResponseDataHandler {
      */
     public static JsonPath convertToJsonPath(JSONObject data) {
         return new JsonPath(JSON.toJSONString(data));
+    }
+
+    /**
+     * 处理响应数据
+     * @param data 响应data
+     */
+    public static JsonPath handleResponseData(String data) {
+        JSONObject jsonObject = convertData(splitWith01(data));
+        return convertToJsonPath(jsonObject);
     }
 
 

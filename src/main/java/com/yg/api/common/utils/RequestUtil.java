@@ -47,44 +47,17 @@ public class RequestUtil {
      *
      * @param contentType 请求的 Content-Type
      * @param url 请求地址
-     * @param requestBody 请求体
+     * @param data 请求体
      * @return Response
      */
-    public static Response doPost(ContentType contentType, String url, JSONObject requestBody) {
-        return given()
-                .spec(requestSpec(contentType, CookieUtil.cookieString))
-                .body(requestBody.toJSONString())// 可以是map或者POJO
-                .post(url);
-    }
-
     public static <T> Response doPost(ContentType contentType, String url, T data) {
         return given()
                 .spec(requestSpec(contentType, CookieUtil.cookieString))
-                .body(data)
+                .body(data)// 可以是map、POJO、jsonString
                 .post(url);
     }
 
-    /**
-     * 发送 POST 请求的通用逻辑
-     */
-    public static Response doPost(String url, JSONObject requestBody) {
-        return doPost(ContentType.JSON, url, requestBody);
-    }
-
-
-    /**
-     * 发送 JSON 格式的 POST 请求
-     */
-    public static JsonPath sendPostJson(String path, JSONObject requestBody, UrlEnum urlType) {
-        String url = BaseInfo.getUrlByUrlType(urlType);
-        return doPost(url + path, requestBody).jsonPath();
-    }
-
-    /**
-     * 发送 x-www-form-urlencoded 格式的 POST 请求
-     */
     public static Response doPostUrlenc(String url, String jsonString, String callBackId) {
-
         return given()
                 .spec(requestSpec(ContentType.URLENC, CookieUtil.cookieString))
                 .formParam("__VIEWSTATE", "")
@@ -93,13 +66,30 @@ public class RequestUtil {
                 .post(url);
     }
 
+    /**
+     * 发送 JSON 格式的 POST 请求
+     */
+    public static JsonPath sendPost(String path, JSONObject requestBody, UrlEnum urlType) {
+        String url = BaseInfo.getUrlByUrlType(urlType);
+        return doPost(ContentType.JSON, url + path, requestBody.toJSONString()).jsonPath();
+    }
+
+    /**
+     * 发送 x-www-form-urlencoded 格式的 POST 请求
+     */
+    public static JsonPath sendPostUrlenc(String url, Map<String, Object> params) {
+        String responseData = doPost(ContentType.URLENC, BaseInfo.ERP_URL + url, buildUrlEncodedRequestBody(params))
+                .getBody().asString();
+        return ResponseDataHandler.handleResponseData(responseData);
+    }
+
     public static JsonPath sendPostUrlenc(String path, String jsonStringParam) {
         String responseData = doPostUrlenc(BaseInfo.ERP_URL + path, jsonStringParam, "JTable1")
                 .getBody().asString();
-        JSONObject responseJson = ResponseDataHandler.convertData(responseData);
-        return ResponseDataHandler.convertToJsonPath(responseJson);
+        return ResponseDataHandler.handleResponseData(responseData);
     }
 
+    // 构造UrlEncoded请求传参body
     public static String buildUrlEncodedRequestBody(Map<String, Object> params) {
         return params.entrySet().stream()
                 .filter(entry -> entry.getValue() != null)

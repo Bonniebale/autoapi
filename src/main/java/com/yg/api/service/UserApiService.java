@@ -1,11 +1,12 @@
 package com.yg.api.service;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.yg.api.common.BaseInfo;
 import com.yg.api.common.constant.ApiConstant;
 import com.yg.api.common.utils.RequestUtil;
-import io.restassured.response.Response;
+import io.restassured.path.json.JsonPath;
 import org.springframework.stereotype.Service;
+
+import static com.yg.api.common.enums.UrlEnum.API;
 
 
 /**
@@ -20,23 +21,23 @@ public class UserApiService {
     /**
      * 登录
      */
-    public Response login(String username, String password) {
+    public JsonPath login(String username, String password) {
         JSONObject body = new JSONObject();
         JSONObject data = new JSONObject();
         body.put("data", data);
         data.put("account", username);
         data.put("password", password);
-        return RequestUtil.doPost(BaseInfo.API_URL + ApiConstant.LOGIN_API, body);
+        return RequestUtil.sendPost(ApiConstant.LOGIN_API, body, API);
     }
 
     /**
      * 获取user信息
      */
-    public String getUser() {
+    public JsonPath getUser() {
         JSONObject body = new JSONObject();
         JSONObject data = new JSONObject();
         body.put("data", data);
-        return RequestUtil.doPost(BaseInfo.API_URL + ApiConstant.GET_USER_INFO, body).getBody().asString();
+        return RequestUtil.sendPost(ApiConstant.GET_USER_INFO, body, API);
     }
 
 

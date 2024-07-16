@@ -3,6 +3,7 @@ package com.yg.api.common.utils;
 import com.alibaba.fastjson2.JSONObject;
 import com.yg.api.common.BaseInfo;
 import com.yg.api.common.constant.ApiConstant;
+import io.restassured.http.ContentType;
 
 import java.util.Map;
 
@@ -43,7 +44,8 @@ public class CookieUtil {
         data.put("account", username);
         data.put("password", password);
 
-        var cookies = RequestUtil.doPost(BaseInfo.API_URL + ApiConstant.LOGIN_API, body).getCookies();
+        var cookies = RequestUtil.doPost(ContentType.JSON, BaseInfo.API_URL + ApiConstant.LOGIN_API, body.toJSONString())
+                .getCookies();
         CookieUtil.cookieString = CookieUtil.formatCookie(cookies);
     }
 
