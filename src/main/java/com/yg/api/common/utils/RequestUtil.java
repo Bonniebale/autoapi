@@ -46,8 +46,8 @@ public class RequestUtil {
      * 发送 POST 请求的通用逻辑
      *
      * @param contentType 请求的 Content-Type
-     * @param url 请求地址
-     * @param data 请求体
+     * @param url         请求地址
+     * @param data        请求体
      * @return Response
      */
     public static <T> Response doPost(ContentType contentType, String url, T data) {
@@ -71,22 +71,21 @@ public class RequestUtil {
      */
     public static JsonPath sendPost(String path, JSONObject requestBody, UrlEnum urlType) {
         String url = BaseInfo.getUrlByUrlType(urlType);
-        return doPost(ContentType.JSON, url + path, requestBody.toJSONString()).jsonPath();
+        Response response = doPost(ContentType.JSON, url + path, requestBody.toJSONString());
+        return ResponseUtil.handleResponseData(response, false);
     }
 
     /**
      * 发送 x-www-form-urlencoded 格式的 POST 请求
      */
     public static JsonPath sendPostUrlenc(String url, Map<String, Object> params) {
-        String responseData = doPost(ContentType.URLENC, BaseInfo.ERP_URL + url, buildUrlEncodedRequestBody(params))
-                .getBody().asString();
-        return ResponseDataHandler.handleResponseData(responseData);
+        Response response = doPost(ContentType.URLENC, BaseInfo.ERP_URL + url, buildUrlEncodedRequestBody(params));
+        return ResponseUtil.handleResponseData(response, true);
     }
 
     public static JsonPath sendPostUrlenc(String path, String jsonStringParam) {
-        String responseData = doPostUrlenc(BaseInfo.ERP_URL + path, jsonStringParam, "JTable1")
-                .getBody().asString();
-        return ResponseDataHandler.handleResponseData(responseData);
+        Response response = doPostUrlenc(BaseInfo.ERP_URL + path, jsonStringParam, "JTable1");
+        return ResponseUtil.handleResponseData(response, true);
     }
 
     // 构造UrlEncoded请求传参body

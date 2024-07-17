@@ -11,31 +11,42 @@ import com.alibaba.fastjson.JSON;
 import io.qameta.allure.internal.shadowed.jackson.core.JsonProcessingException;
 import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class RequestDataHandler {
-    public static Map<String, Object> generateReqParamACall(String method, List<Object> params, Integer dataType, Map<String, Object> otherArgs) {
-        return constructRequestData(method, params, "ACall1", dataType, otherArgs);
+
+    //CALLBACKID = ACall1
+    public static Map<String, Object> generateReqParamACall(String method, Map<String, Object> data, Integer dataType, Map<String, Object> otherArgs) {
+        return constructRequestData(method, List.of(JSON.toJSONString(data)), "ACall1", dataType, otherArgs);
     }
 
-    public static Map<String, Object> generateReqParamJTable(String method, List<Object> params, Integer dataType, Map<String, Object> otherArgs) {
-        return constructRequestData(method, params, "JTable1", dataType, otherArgs);
+    //CALLBACKID = JTable1
+    public static Map<String, Object> generateReqParamJTable(String method, List<String> data, Integer dataType, Map<String, Object> otherArgs) {
+        return constructRequestData(method, data, "JTable1", dataType, otherArgs);
     }
 
     // 构造查询参数
     public static String generateQueryParams(List<Map<String, String>> params) {
-        ArrayList<Object> queryList = new ArrayList<>();
-        queryList.add("1");
-        queryList.add(JSON.toJSONString(params));
-        queryList.add("{}");
-        return constructCallBackParamData("LoadDataToJSON", queryList, 2);
+
+        return constructCallBackParamData("LoadDataToJSON",
+                List.of("1", JSON.toJSONString(params), "{}"),
+                2
+        );
     }
 
-    // 构造请求数据
-    public static Map<String, Object> constructRequestData(String method, List<Object> params, String callBackId, Integer dataType, Map<String, Object> otherArgs) {
+    /**
+     * 构造请求数据
+     *
+     * @param method     方法名称
+     * @param params     请求参数
+     * @param callBackId 回调ID, ACall1 / JTable1
+     * @param dataType   request数据的结构类型 1: 有[Args] && [CallControl] 2: 无[CallControl]的基础请求数据 3: 无[Args]的基础请求数据
+     * @param otherArgs  其他参数, 指与【__CALLBACKPARAM】 同级的参数
+     */
+    private static Map<String, Object> constructRequestData(String method, List<String> params, String callBackId, Integer dataType, Map<String, Object> otherArgs) {
+
         Map<String, Object> data = new HashMap<>(otherArgs != null ? otherArgs : new HashMap<>());
         data.put("__VIEWSTATE", "");
         data.put("__CALLBACKID", callBackId);
@@ -43,8 +54,8 @@ public class RequestDataHandler {
         return data;
     }
 
-    // 构造 __CALLBACKPARAM 参数内容
-    private static String constructCallBackParamData(String method, List<Object> params, int dataType) {
+    //构造 __CALLBACKPARAM 参数内容
+    private static String constructCallBackParamData(String method, List<String> params, int dataType) {
         Map<String, Object> callBackParam = new HashMap<>();
         callBackParam.put("Method", method);
 
