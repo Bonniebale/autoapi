@@ -1,7 +1,5 @@
 package com.yg.api.common.utils;
 
-import org.testng.annotations.Test;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,7 +48,7 @@ public class CommonUtil {
                 .collect(Collectors.toList());
     }
 
-    // 把list 转成"a,b,c"的形式
+    // 把["a","b","c"] 转成"a,b,c"
     private static String convertToString(Object value) {
         if (value instanceof List) {
             return ((List<?>)value).stream()
@@ -61,16 +59,4 @@ public class CommonUtil {
         }
     }
 
-    @Test
-    public void genQuer() {
-        ArrayList<String> skuList = new ArrayList<>();
-        skuList.add("strawberry");
-        skuList.add("milk");
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("sku_id", "1");
-        params.put("wms_co_id", "");
-        List<Map<String, String>> list = generateQueryCondition(params);
-        System.out.println(list);
-    }
 }
