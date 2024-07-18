@@ -22,6 +22,7 @@
         <fastjson.version>2.0.47</fastjson.version>
         <junit.version>5.10.2</junit.version>
         <allure.version>2.24.0</allure.version>
+        <collections.version>4.4</collections.version>
     </properties>
 
     <dependencies>
@@ -107,6 +108,13 @@
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit5</artifactId>
             <version>${allure.version}</version>
+        </dependency>
+
+        <!--commons-collections4-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${collections.version}</version>
         </dependency>
 
     </dependencies>

@@ -48,7 +48,7 @@ public class CommonUtil {
                 .collect(Collectors.toList());
     }
 
-    // 把["a","b","c"] 转成"a,b,c"
+    // 把[a,b,c] 转成"a,b,c"
     private static String convertToString(Object value) {
         if (value instanceof List) {
             return ((List<?>)value).stream()
@@ -58,5 +58,11 @@ public class CommonUtil {
             return value.toString();
         }
     }
+
+    //生成对应仓库的暂存位id
+    public static String generateTempId(int companyId, int whTypeId) {
+        return String.format("9%d00000%d000", companyId, whTypeId);
+    }
+
 
 }
