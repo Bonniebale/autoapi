@@ -1,6 +1,6 @@
 package com.yg.api.entity;
 
-import com.yg.api.common.enums.InboundTypeEnum;
+import com.yg.api.common.enums.InTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,7 +34,7 @@ public class InboundDto extends BaseSkuDto {
     private String deliveryNo;
     // 进仓类型
     // PO/1 :采购入库, MO/2:加工入库库, BIO/4:预约入库, QimenWms/5:奇门WMS, LID/6:物流单号
-    private String inboundType = InboundTypeEnum.PO.getValue();
+    private InTypeEnum inboundType = InTypeEnum.PO;
     // 是否进仓装箱
     private boolean inByPack = false;
     // 是否批量装箱

@@ -1,10 +1,11 @@
 package com.yg.api.testcase;
 
+import com.yg.api.common.enums.InTypeEnum;
 import com.yg.api.entity.InboundDto;
+import org.assertj.core.util.Lists;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,15 +19,19 @@ public class TestInbound extends BaseTest {
     @DataProvider(name = "inboundParam")
     public Object[][] inboundParam() {
         return new Object[][]{
-                {InboundDto.builder().skus(List.of("strawberry", "milk")).inboundType("").deliveryNo("").build()},
-                {InboundDto.builder()}
+                {InboundDto.builder().skus(List.of("strawberry", "milk")).inboundType(InTypeEnum.BIO).deliveryNo("").build()},
+                {"strawberry,milk", 1, InTypeEnum.PO}
         };
     }
 
     @Test(dataProvider = "inboundParam")
-    public void testPostRequest(InboundDto inboundDto) {
+    public void testPostRequest(String sku, int qty, InTypeEnum inboundType) {
 
-        List<String> skus = inboundDto.getSkus();
+        InboundDto.builder()
+                .skus(Lists.newArrayList(sku.split(",")))
+                .qty(qty)
+                .inboundType(inboundType)
+                .build();
 
 
     }
