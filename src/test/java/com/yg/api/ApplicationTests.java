@@ -36,7 +36,7 @@ public class ApplicationTests extends AbstractTestNGSpringContextTests {
 
     @Test
     void contextLoads() {
-        System.out.println(baseUser);
+//        System.out.println(baseUser);
     }
 
 }

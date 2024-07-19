@@ -21,7 +21,7 @@ import java.util.List;
 @SuperBuilder(toBuilder = true)
 public class BaseSkuDto extends BaseDto {
     // 基础信息
-    private List<String> skus = List.of("nfsq");
+    private List<String> sku = List.of("nfsq");
     private int qty = 1;
     // 是否组合装
     private boolean isCombine = false;

@@ -1,5 +1,6 @@
 package com.yg.api.entity;
 
+import com.yg.api.common.enums.WhTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,8 +29,8 @@ public class BaseDto {
     private boolean isActive = true;
     // 是否第三方仓储
     private boolean isThirdPartyWarehouse = false;
-    // 仓库类型id，默认为主仓，1: 主仓, 2: 销退仓 3: 进货仓, 4: 次品仓, 6: 自定义1仓
+    // 仓库类型id 1: 主仓, 2: 销退仓 3: 进货仓, 4: 次品仓, 6: 自定义1仓
     private int whTypeId = 1;
     // 仓库类型 default:主仓, pick:拣货仓, in:进货仓, return:销退仓, defective:次品仓
-    private String warehouseType;
+    private WhTypeEnum warehouseType = WhTypeEnum.DEFAULT;
 }
