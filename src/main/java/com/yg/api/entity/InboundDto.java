@@ -1,8 +1,8 @@
 package com.yg.api.entity;
 
-import com.yg.api.common.enums.InTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -14,6 +14,7 @@ import java.util.List;
  * @Author flora
  * @Date 2024/7/16 22:39
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,7 +35,7 @@ public class InboundDto extends BaseSkuDto {
     private String deliveryNo;
     // 进仓类型
     // PO/1 :采购入库, MO/2:加工入库库, BIO/4:预约入库, QimenWms/5:奇门WMS, LID/6:物流单号
-    private InTypeEnum inboundType = InTypeEnum.PO;
+    private String inboundType = "po";
     // 是否进仓装箱
     private boolean inByPack = false;
     // 是否批量装箱
@@ -42,7 +43,7 @@ public class InboundDto extends BaseSkuDto {
 
     // 商品信息
     // 唯一码
-    private List<String> serialNumber;
+    private List<String> SNs;
 
     /**
      * 自定义字段
