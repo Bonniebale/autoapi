@@ -1,4 +1,4 @@
-package com.yg.api.service;
+package com.yg.api.service.stock;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.yg.api.assemblyParams.AssemblyInventoryParams;
@@ -7,6 +7,7 @@ import com.yg.api.common.enums.WhTypeEnum;
 import com.yg.api.common.utils.CommonUtil;
 import com.yg.api.common.utils.RequestDataHandler;
 import com.yg.api.common.utils.RequestUtil;
+import com.yg.api.service.BaseApiService;
 import io.restassured.path.json.JsonPath;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,10 @@ public class InventoryApiService extends BaseApiService {
                 )
         );
         String data = RequestDataHandler.generateQueryParams(queryParam);
-        return RequestUtil.sendPostUrlenc(path, data);
+        return RequestUtil.sendUrlencJ(path, data);
     }
 
-    //查询组合装库存
+    // 查询组合装库存
     public JsonPath getCombSkuStock(List<String> skus, Integer ownerWhId, Integer subWhId) {
         String path = CommonUtil.generateCrossPath(ApiConstant.SUB_STOCK_ASPX, ownerWhId, subWhId);
         var queryParam = CommonUtil.generateQueryCondition(Map.of(
@@ -63,7 +64,7 @@ public class InventoryApiService extends BaseApiService {
                 )
         );
         String data = RequestDataHandler.generateQueryParams(queryParam);
-        return RequestUtil.sendPostUrlenc(path, data);
+        return RequestUtil.sendUrlencJ(path, data);
     }
 
 
@@ -84,21 +85,21 @@ public class InventoryApiService extends BaseApiService {
     public HashMap<String, Object> getMultipleStocks(List<String> sku, WhTypeEnum whTypeId, List<Integer> subStorageId, Integer companyId, List<String> bin,
                                                      List<String> comSku, List<String> batchId, boolean isRefined, Integer ownerWhId, Integer subWhId) {
         HashMap<String, Object> stockMap = new HashMap<>();
-        //商品库存
+        // 商品库存
         var stock = getSkuStock(sku, ownerWhId, subWhId);
 
-        //商品库存(分仓)库存
+        // 商品库存(分仓)库存
         var subStock = getSubWarehouseSkuStock(sku, subStorageId, ownerWhId, subWhId);
         stockMap.put("stock", stock);
         stockMap.put("subStock", subStock);
 
-        //暂存位库存
+        // 暂存位库存
         if (null != companyId) {
             String tempId = CommonUtil.generateTempId(companyId, whTypeId.getId());
             var tempStock = packStockApiService.getStockInfo(sku, tempId, batchId);
             stockMap.put("tempStock", tempStock);
         }
-        //仓位库存
+        // 仓位库存
         if (CollectionUtils.isNotEmpty(bin)) {
             List<String> querySku = CollectionUtils.isNotEmpty(comSku) ? comSku : sku;
             boolean isCombine = CollectionUtils.isNotEmpty(comSku);
@@ -106,13 +107,13 @@ public class InventoryApiService extends BaseApiService {
             stockMap.put("binStock", binStock);
         }
 
-        //组合装库存
+        // 组合装库存
         if (CollectionUtils.isNotEmpty(comSku)) {
             var comStock = getCombSkuStock(comSku, ownerWhId, subWhId);
             stockMap.put("comStock", comStock);
 
         }
-        //生产批次库存
+        // 生产批次库存
         if (!isRefined && CollectionUtils.isNotEmpty(batchId)) {
             stockMap.put("batchStock", "batchStock");
 

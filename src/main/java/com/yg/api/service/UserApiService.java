@@ -40,5 +40,12 @@ public class UserApiService {
         return RequestUtil.sendPost(ApiConstant.GET_USER_INFO, body, API);
     }
 
+    /**
+     * 获取登录用户的company Id
+     */
+    public int getCompanyId() {
+        return getUser().getInt("data.coId");
+    }
+
 
 }

@@ -1,12 +1,5 @@
 package com.yg.api.common.utils;
 
-/**
- * @ClassName RequestDataUtil
- * @Description TODO
- * @Author flora
- * @Date 2024/7/13 17:48
- */
-
 import com.alibaba.fastjson.JSON;
 import io.qameta.allure.internal.shadowed.jackson.core.JsonProcessingException;
 import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
@@ -15,14 +8,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @ClassName RequestDataUtil
+ * @Description 处理请求数据
+ * @Author Flora
+ * @Date 2024/7/13 17:48
+ */
 public class RequestDataHandler {
 
-    //CALLBACKID = ACall1
     public static Map<String, Object> generateReqParamACall(String method, Map<String, Object> data, Integer dataType, Map<String, Object> otherArgs) {
         return constructRequestData(method, List.of(JSON.toJSONString(data)), "ACall1", dataType, otherArgs);
     }
 
-    //CALLBACKID = JTable1
+    //  ACall1, 有[Args] && [CallControl]，无其他参数
+    public static Map<String, Object> generateReqParamACall(String method, Map<String, Object> data) {
+        return constructRequestData(method, List.of(JSON.toJSONString(data)), "ACall1", 1, null);
+    }
+
+
+    // ACall1, 只有[CallControl], 无任何参数
+    public static Map<String, Object> generateReqParamACall(String method) {
+        return constructRequestData(method, null, "ACall1", 3, null);
+    }
+
+    // JTable1
     public static Map<String, Object> generateReqParamJTable(String method, List<String> data, Integer dataType, Map<String, Object> otherArgs) {
         return constructRequestData(method, data, "JTable1", dataType, otherArgs);
     }
@@ -54,7 +63,7 @@ public class RequestDataHandler {
         return data;
     }
 
-    //构造 __CALLBACKPARAM 参数内容
+    // 构造 __CALLBACKPARAM 参数内容
     private static String constructCallBackParamData(String method, List<String> params, int dataType) {
         Map<String, Object> callBackParam = new HashMap<>();
         callBackParam.put("Method", method);

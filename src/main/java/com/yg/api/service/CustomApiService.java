@@ -1,6 +1,9 @@
 package com.yg.api.service;
 
 import com.yg.api.assemblyParams.AssemblyCustomConfigParams;
+import com.yg.api.common.constant.ApiConstant;
+import com.yg.api.common.utils.RequestUtil;
+import io.restassured.path.json.JsonPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,9 +46,11 @@ public class CustomApiService extends BaseApiService {
         return CUSTOM_CONFIG_KEYS.get(configType);
     }
 
-    public <T> void setConfig(int configType, T configValue) {
+    //设置基础设置
+    public <T> JsonPath setConfig(int configType, T configValue) {
         String key = getCustomConfigKey(configType);
-        assemblyCustomConfigParams.generateSetConfigParams(key,configValue);
+        var data = assemblyCustomConfigParams.generateSetConfigParams(key, configValue);
+        return RequestUtil.sendPostUrlenc(ApiConstant.CUSTOM_CONFIG_ASPX, data);
     }
 
 }

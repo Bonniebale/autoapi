@@ -1,10 +1,11 @@
-package com.yg.api.service;
+package com.yg.api.service.stock;
 
 import com.yg.api.common.constant.ApiConstant;
 import com.yg.api.common.enums.WhTypeEnum;
 import com.yg.api.common.utils.CommonUtil;
 import com.yg.api.common.utils.RequestDataHandler;
 import com.yg.api.common.utils.RequestUtil;
+import com.yg.api.service.BaseApiService;
 import io.restassured.path.json.JsonPath;
 import org.springframework.stereotype.Service;
 
@@ -40,11 +41,11 @@ public class PackStockApiService extends BaseApiService {
         var queryParam = CommonUtil.generateQueryCondition(queryConditions);
         var data = RequestDataHandler.generateQueryParams(queryParam);
         System.out.println(data);
-        return RequestUtil.sendPostUrlenc(path, data);
+        return RequestUtil.sendUrlencJ(path, data);
     }
 
     public JsonPath getStockInfo(List<String> skus) {
-        return getStockInfo(skus, null, null, null, null, false, null, null, null);
+        return getStockInfo(skus, WhTypeEnum.IN, null, null, null, false, null, null, null);
     }
 
     //暂存位库存

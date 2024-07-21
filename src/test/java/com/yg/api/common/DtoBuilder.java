@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  * @ClassName DtoBuilder
- * @Description TODO
+ * @Description 将参数进行实例化
  * @Author flora
  * @Date 2024/7/20 13:22
  */
@@ -30,7 +30,7 @@ public class DtoBuilder {
             // 调用 build 方法构建对象
             Method buildMethod = builder.getClass().getMethod("build");
             buildMethod.setAccessible(true);
-            return (T) buildMethod.invoke(builder);
+            return (T)buildMethod.invoke(builder);
 
         } catch (Exception e) {
             throw new RuntimeException("实例化失败: " + e.getMessage(), e);
@@ -60,16 +60,15 @@ public class DtoBuilder {
                 Object convertedValue = convertValue(value, setterMethod.getParameterTypes()[0]);
                 setterMethod.invoke(builder, convertedValue);
             } else {
-                throw new RuntimeException("No setter method found for field: " + fieldName);
+                throw new RuntimeException("找不到该字段的setter方法: " + fieldName);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to set property on builder: " + e.getMessage(), e);
+            throw new RuntimeException("build属性失败: " + e.getMessage(), e);
         }
     }
 
     // 查找setter方法
     public static Method findSetterMethod(Class<?> builderClass, String fieldName) {
-        System.out.println("setterName:"+fieldName);
         Class<?> currentClass = builderClass;
 
         while (currentClass != null) {
@@ -102,6 +101,12 @@ public class DtoBuilder {
         return Optional.empty();
     }
 
+    /**
+     * 转换值
+     *
+     * @param value 值
+     * @param targetType 目标类型
+     */
     private static Object convertValue(Object value, Class<?> targetType) {
         if (targetType.isInstance(value)) {
             return value;

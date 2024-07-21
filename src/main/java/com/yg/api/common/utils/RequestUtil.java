@@ -27,8 +27,6 @@ public class RequestUtil {
 
     /**
      * 初始化header
-     *
-     * @param cookie cookie 信息
      */
     private static RequestSpecification requestSpec(ContentType contentType, String cookie) {
         RequestSpecBuilder specBuilder = new RequestSpecBuilder()
@@ -57,12 +55,12 @@ public class RequestUtil {
                 .post(url);
     }
 
-    public static Response doPostUrlenc(String url, String jsonString, String callBackId) {
+    public static <T> Response doPostUrlenc(String url, T data, String callBackId) {
         return given()
                 .spec(requestSpec(ContentType.URLENC, CookieUtil.cookieString))
                 .formParam("__VIEWSTATE", "")
                 .formParam("__CALLBACKID", callBackId)
-                .formParam("__CALLBACKPARAM", jsonString)
+                .formParam("__CALLBACKPARAM", data)
                 .post(url);
     }
 
@@ -83,13 +81,28 @@ public class RequestUtil {
         return ResponseUtil.handleResponseData(response, true);
     }
 
-    public static JsonPath sendPostUrlenc(String path, String jsonStringParam) {
-        Response response = doPostUrlenc(BaseInfo.ERP_URL + path, jsonStringParam, "JTable1");
+    public static <T> JsonPath postUrlenc(String path, T data, String callBackId) {
+        Response response = doPostUrlenc(BaseInfo.ERP_URL + path, data, callBackId);
         return ResponseUtil.handleResponseData(response, true);
     }
 
-    // 构造UrlEncoded请求传参body
-    public static String buildUrlEncodedRequestBody(Map<String, Object> params) {
+    /**
+     * JTable1 的 post Urlenc 请求
+     */
+    public static JsonPath sendUrlencJ(String path, String jsonStringParam) {
+        return postUrlenc(path, jsonStringParam, "JTable1");
+    }
+
+    /**
+     * ACall1 的 post Urlenc 请求
+     */
+    public static <T> JsonPath sendUrlencA(String path, T data) {
+        return postUrlenc(path, data, "ACall1");
+    }
+
+
+    // 构造UrlEncoded请求body
+    private static String buildUrlEncodedRequestBody(Map<String, Object> params) {
         return params.entrySet().stream()
                 .filter(entry -> entry.getValue() != null)
                 .map(entry -> encode(entry.getKey()) + "=" + encode(entry.getValue().toString()))
