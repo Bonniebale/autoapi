@@ -106,7 +106,7 @@ public class TestInbound extends BaseTest {
             inboundDto.setSNs(List.of(CommonUtil.generateSpecifiedLengthStr(20)));
         }
         // 生产批次
-        if (inboundDto.getIsBatch() && null == inboundDto.getBatchId()) {
+        if (inboundDto.isBatch() && null == inboundDto.getBatchId()) {
             var batchInfo = batchApiService.generateBatchInfo();
             inboundDto.setBatchId(batchInfo.get("batchId"));
             inboundDto.setProductionDate(batchInfo.get("productionDate"));
