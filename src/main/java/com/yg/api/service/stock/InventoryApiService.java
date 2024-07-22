@@ -86,22 +86,22 @@ public class InventoryApiService extends BaseApiService {
      * @param ownerWhId    货主id
      * @param subWhId      有权限的仓库id
      */
-    public Map<String, Object> getMultipleStocks(List<String> sku, int whTypeId, List<Integer> subStorageId, Integer companyId, List<String> bin,
-                                                 List<String> comSku, String batchId, boolean isRefined, Integer ownerWhId, Integer subWhId) {
+    public Map<String, List<Map<String, Object>>> getMultipleStocks(List<String> sku, int whTypeId, List<Integer> subStorageId, Integer companyId, List<String> bin,
+                                                                    List<String> comSku, String batchId, boolean isRefined, Integer ownerWhId, Integer subWhId) {
 
-        HashMap<String, Object> stockMap = new HashMap<>();
+        Map<String, List<Map<String, Object>>> stockMap = new HashMap<>();
         // 商品库存
-        var stock = getSkuStock(sku, ownerWhId, subWhId).getList("data");
+        List<Map<String, Object>> stock = getSkuStock(sku, ownerWhId, subWhId).getList("data");
 
         // 商品库存(分仓)库存
-        var subStock = getSubWarehouseSkuStock(sku, subStorageId, ownerWhId, subWhId).getList("ReturnValue.datas");
+        List<Map<String, Object>> subStock = getSubWarehouseSkuStock(sku, subStorageId, ownerWhId, subWhId).getList("ReturnValue.datas");
         stockMap.put("stock", stock);
         stockMap.put("subStock", subStock);
 
         // 暂存位库存
         if (null != companyId) {
             String tempId = CommonUtil.generateTempId(companyId, whTypeId);
-            var tempStock = packStockApiService.getStockInfo(sku, tempId, batchId).getList("ReturnValue.datas");
+            List<Map<String, Object>> tempStock = packStockApiService.getStockInfo(sku, tempId, batchId).getList("ReturnValue.datas");
             stockMap.put("tempStock", tempStock);
         }
 
@@ -109,19 +109,19 @@ public class InventoryApiService extends BaseApiService {
         if (CollectionUtils.isNotEmpty(bin)) {
             List<String> querySku = CollectionUtils.isNotEmpty(comSku) ? comSku : sku;
             boolean isCombine = CollectionUtils.isNotEmpty(comSku);
-            var binStock = packStockApiService.getStockInfo(querySku, bin, batchId, isCombine).getList("ReturnValue.datas");
+            List<Map<String, Object>> binStock = packStockApiService.getStockInfo(querySku, bin, batchId, isCombine).getList("ReturnValue.datas");
             stockMap.put("binStock", binStock);
         }
 
         // 组合装库存
         if (CollectionUtils.isNotEmpty(comSku)) {
-            var comStock = getCombSkuStock(comSku, ownerWhId, subWhId).getList("ReturnValue.datas");
+            List<Map<String, Object>> comStock = getCombSkuStock(comSku, ownerWhId, subWhId).getList("ReturnValue.datas");
             stockMap.put("comStock", comStock);
         }
 
         // 生产批次库存
         if (!isRefined && StringUtils.isNotBlank(batchId)) {
-            var batchStock = batchApiService.getBatchStock(sku, batchId).getList("ReturnValue.datas");
+            List<Map<String, Object>> batchStock = batchApiService.getBatchStock(sku, batchId).getList("ReturnValue.datas");
             stockMap.put("batchStock", batchStock);
         }
 

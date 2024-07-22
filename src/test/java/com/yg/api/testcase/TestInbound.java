@@ -1,5 +1,6 @@
 package com.yg.api.testcase;
 
+import com.yg.api.common.AssertionUtil;
 import com.yg.api.common.DtoBuilder;
 import com.yg.api.common.StockDataVerifyUtil;
 import com.yg.api.common.enums.WhTypeEnum;
@@ -84,12 +85,12 @@ public class TestInbound extends BaseTest {
 
     }
 
-    //查询库存信息，包括商品库存、暂存位库存、分仓库存
-    private Map<String, Object> getMultipleStock(InboundDto inboundDto) {
+    // 查询库存信息，包括商品库存、暂存位库存、分仓库存
+    private Map<String, List<Map<String, Object>>> getMultipleStock(InboundDto inboundDto) {
 
         // 获取 storageId，若 subWhId 不为 0 则使用 subWhId，否则使用 companyId
         int storageId = (inboundDto.getSubWhId() != 0) ? inboundDto.getSubWhId() : inboundDto.getCompanyId();
-        //查询暂存位的公司id
+        // 查询暂存位的公司id
         Integer tempCoId = inboundDto.isActive() ? storageId : null;
         // 若 isTempBatch 为 true，则将 batchId 设置为一个包含该 batchId 的列表
         String batchIds = inboundDto.isTempBatch() ? inboundDto.getBatchId() : null;
@@ -103,9 +104,9 @@ public class TestInbound extends BaseTest {
     }
 
     /**
-     * 生成库存校验数据
+     * 生成需要校验的库存字段、数量
      */
-    private Object generateVerifyStockData(InboundDto params, Map<String, Object> originalStock, Map<String, Object> currentStock) {
+    private Map<String, Map<String, Integer>> generateVerifyField(InboundDto params) {
 
         var stockField = WhTypeEnum.getStockFieldById(params.getWhTypeId());
         Map<String, Integer> fieldAndQty = Map.of(String.valueOf(stockField), params.getQty());
@@ -123,14 +124,7 @@ public class TestInbound extends BaseTest {
         if (!params.isActive() && StringUtils.isNotBlank(params.getBatchId())) {
             qtyAndField.put("batchStock", Map.of("qty", params.getQty()));
         }
-
-        // 处理临时批次
-        if (params.isTempBatch()) {
-//            String expr = JmespathUtils.generateJmespathFilterExpr(params.getBatchId(), params.getProductionDate());
-//            boolean isDataCountZero = (int) ((Map<String, Object>) originalStock.get("tempStock").get("dp")).get("DataCount") == 0;
-//            VerificationDataUtil.filterStockByBatch(originalStock, currentStock, TypesConstant.TEMP_STOCK, expr, isDataCountZero, 2);
-        }
-        return StockDataVerifyUtil.generateVerifyStockData(originalStock, currentStock, qtyAndField);
+        return qtyAndField;
     }
 
 
@@ -183,9 +177,19 @@ public class TestInbound extends BaseTest {
     /**
      * 校验
      */
-    private void verification(InboundDto inboundDto, Object order_info, Map<String, Object> originalStockMap, Map<String, Object> currentStockMap) {
+    private void verification(InboundDto inboundDto, Object order, Map<String, List<Map<String, Object>>> originalStock, Map<String, List<Map<String, Object>>> currentStock) {
+        // 生成校验字段和qty
+        var verifyStockField = generateVerifyField(inboundDto);
 
-        var verifyStockData = generateVerifyStockData(inboundDto, originalStockMap, currentStockMap);
+        // 过滤数据
+        if (inboundDto.isTempBatch()) {
+//            String expr = JmespathUtils.generateJmespathFilterExpr(params.getBatchId(), params.getProductionDate());
+//            boolean isDataCountZero = (int) ((Map<String, Object>) originalStock.get("tempStock").get("dp")).get("DataCount") == 0;
+//            VerificationDataUtil.filterStockByBatch(originalStock, currentStock, TypesConstant.TEMP_STOCK, expr, isDataCountZero, 2);
+        }
+        // 校验库存
+        var verifyStockData = StockDataVerifyUtil.generateVerifyStockData(originalStock, currentStock, verifyStockField);
+        AssertionUtil.batchVerifyStockInfo(verifyStockData);
 
 
     }

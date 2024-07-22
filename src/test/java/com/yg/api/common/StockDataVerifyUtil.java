@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @ClassName StockDataVerifyUtil
@@ -14,18 +13,15 @@ import java.util.stream.Stream;
  */
 public class StockDataVerifyUtil {
 
-    public static Object generateVerifyStockData(Map<String, Object> originalStock, Map<String, Object> currentStock, Map<String, Map<String, Integer>> filedAndQty) {
-
-        Stream.of(originalStock, currentStock, filedAndQty)
-                .filter(entry -> !entry.isEmpty())
-        ;
-        return null;
-    }
-
-
-    // 生成需要校验的库存数据集合
-    public static List<Map<String, Object>> generateVerifyStockData111(Map<String, List<Map<String, Object>>> originalStock, Map<String, List<Map<String, Object>>> currentStock,
-                                                                       Map<String, Map<String, Integer>> qtyAndField) {
+    /**
+     * 生成需要校验的库存数据集合
+     *
+     * @param originalStock 初始库存
+     * @param currentStock 当前库存
+     * @param qtyAndField 校验字段和数量
+     */
+    public static List<Map<String, Object>> generateVerifyStockData(Map<String, List<Map<String, Object>>> originalStock, Map<String, List<Map<String, Object>>> currentStock,
+                                                                    Map<String, Map<String, Integer>> qtyAndField) {
 
         return originalStock.keySet().stream()
                 .filter(stockType -> originalStock.get(stockType) != null && !originalStock.get(stockType).isEmpty())
@@ -70,18 +66,17 @@ public class StockDataVerifyUtil {
 
 
     // 创建校验条目
-    private static Map<String, Object> createVerificationEntry(List<Map<String, Object>> initialStock, List<Map<String, Object>> currentStock,
-                                                               Map<String, Integer> fields, String desc) {
+    private static Map<String, Object> createVerificationEntry(List<Map<String, Object>> initialStock, List<Map<String, Object>> currentStock, Map<String, Integer> field, String desc) {
 
         if (initialStock == null || initialStock.isEmpty()) {
             return Collections.emptyMap();
         }
 
         return Map.of(
-                "initial_stock", initialStock,
-                "current_stock", currentStock,
-                "fields", fields,
-                "description", desc
+                "initialStock", initialStock,
+                "currentStock", currentStock,
+                "field", field,
+                "desc", desc
         );
     }
 
