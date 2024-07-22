@@ -1,18 +1,22 @@
 package com.yg.api.testcase;
 
 import com.yg.api.common.DtoBuilder;
+import com.yg.api.common.StockDataVerifyUtil;
+import com.yg.api.common.enums.WhTypeEnum;
 import com.yg.api.common.utils.CommonUtil;
 import com.yg.api.entity.InboundDto;
 import com.yg.api.service.PurInboundApiService;
 import com.yg.api.service.UserApiService;
+import com.yg.api.service.stock.BatchApiService;
 import com.yg.api.service.stock.InventoryApiService;
-import com.yg.api.service.stock.ProductionBatchApiService;
+import org.junit.platform.commons.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,12 +36,12 @@ public class TestInbound extends BaseTest {
     @Autowired
     UserApiService userApiService;
     @Autowired
-    ProductionBatchApiService batchApiService;
+    BatchApiService batchApiService;
 
     @DataProvider(name = "inboundParam")
     public static Object[][] inboundParam() {
         return new Object[][]{
-                {"sku1,sku2", "2", "1", "mo", "123", false, true, true},
+                {"nfsq,milk", "2", "1", "", "", false, true, true},
                 // {"strawberry,milk", "3", "po"}
         };
     }
@@ -67,32 +71,75 @@ public class TestInbound extends BaseTest {
 
     // 步骤和校验
     public void step(InboundDto inboundDto) {
+
         preprocessingParam(inboundDto);
         // 查询初始库存
-        var originalStockMap = getMultipleStock(inboundDto, inboundDto.getCompanyId(), inboundDto.getSubWhId());
-
+        var originalStockMap = getMultipleStock(inboundDto);
         // 入库点数/入库装箱
         var orderInfo = purInboundApiService.createInboundOrder(inboundDto, inboundDto.getCompanyId(), inboundDto.getSubWhId());
-
         // 查询当前库存
-        var currentStockMap = getMultipleStock(inboundDto, inboundDto.getCompanyId(), inboundDto.getSubWhId());
-
+        var currentStockMap = getMultipleStock(inboundDto);
         // 校验
-        var verifyStockData = generateVerifyStockData(inboundDto, originalStockMap, currentStockMap);
-        verification(inboundDto, orderInfo, verifyStockData);
+        verification(inboundDto, orderInfo, originalStockMap, currentStockMap);
 
     }
 
-    private Object generateVerifyStockData(InboundDto inboundDto, Object originalStockDict, Object currentStockDict) {
-        return null;
+    //查询库存信息，包括商品库存、暂存位库存、分仓库存
+    private Map<String, Object> getMultipleStock(InboundDto inboundDto) {
+
+        // 获取 storageId，若 subWhId 不为 0 则使用 subWhId，否则使用 companyId
+        int storageId = (inboundDto.getSubWhId() != 0) ? inboundDto.getSubWhId() : inboundDto.getCompanyId();
+        //查询暂存位的公司id
+        Integer tempCoId = inboundDto.isActive() ? storageId : null;
+        // 若 isTempBatch 为 true，则将 batchId 设置为一个包含该 batchId 的列表
+        String batchIds = inboundDto.isTempBatch() ? inboundDto.getBatchId() : null;
+
+        if (inboundDto.isThirdPartyWarehouse()) {
+            storageId = 0;
+            tempCoId = inboundDto.getCompanyId();
+        }
+        return inventoryApiService.getMultipleStocks(inboundDto.getSku(), inboundDto.getWhTypeId(), List.of(storageId),
+                tempCoId, null, null, batchIds, inboundDto.isActive(), null, null);
     }
 
-    private Object getMultipleStock(InboundDto inboundDto, int companyId, int subWhId) {
-        return null;
+    /**
+     * 生成库存校验数据
+     */
+    private Object generateVerifyStockData(InboundDto params, Map<String, Object> originalStock, Map<String, Object> currentStock) {
+
+        var stockField = WhTypeEnum.getStockFieldById(params.getWhTypeId());
+        Map<String, Integer> fieldAndQty = Map.of(String.valueOf(stockField), params.getQty());
+
+        Map<String, Map<String, Integer>> qtyAndField = new HashMap<>();
+        qtyAndField.put("stock", fieldAndQty);
+        qtyAndField.put("subStock", fieldAndQty);
+
+        // 添加 temp stock
+        if (params.isActive()) {
+            qtyAndField.put("tempStock", Map.of("qty", StringUtils.isNotBlank(params.getBin()) ? 0 : params.getQty()));
+        }
+
+        // 添加 batch stock
+        if (!params.isActive() && StringUtils.isNotBlank(params.getBatchId())) {
+            qtyAndField.put("batchStock", Map.of("qty", params.getQty()));
+        }
+
+        // 处理临时批次
+        if (params.isTempBatch()) {
+//            String expr = JmespathUtils.generateJmespathFilterExpr(params.getBatchId(), params.getProductionDate());
+//            boolean isDataCountZero = (int) ((Map<String, Object>) originalStock.get("tempStock").get("dp")).get("DataCount") == 0;
+//            VerificationDataUtil.filterStockByBatch(originalStock, currentStock, TypesConstant.TEMP_STOCK, expr, isDataCountZero, 2);
+        }
+        return StockDataVerifyUtil.generateVerifyStockData(originalStock, currentStock, qtyAndField);
     }
 
-    // 预处理参数
-    public void preprocessingParam(InboundDto inboundDto) {
+
+    /**
+     * 参数预处理
+     */
+    private void preprocessingParam(InboundDto inboundDto) {
+
+        inboundDto.setActive(true);
         inboundDto.setCompanyId(userApiService.getCompanyId());
         String num = CommonUtil.generateSpecifiedLengthStr(14);
 
@@ -133,8 +180,13 @@ public class TestInbound extends BaseTest {
     private void handlerInboundWithOrder(InboundDto inboundDto) {
     }
 
-    // 校验
-    public void verification(InboundDto inboundDto, Object order_info, Object verify_stock_data) {
+    /**
+     * 校验
+     */
+    private void verification(InboundDto inboundDto, Object order_info, Map<String, Object> originalStockMap, Map<String, Object> currentStockMap) {
+
+        var verifyStockData = generateVerifyStockData(inboundDto, originalStockMap, currentStockMap);
+
 
     }
 

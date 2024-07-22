@@ -3,13 +3,13 @@ package com.yg.api.service.stock;
 import com.alibaba.fastjson2.JSONObject;
 import com.yg.api.assemblyParams.AssemblyInventoryParams;
 import com.yg.api.common.constant.ApiConstant;
-import com.yg.api.common.enums.WhTypeEnum;
 import com.yg.api.common.utils.CommonUtil;
 import com.yg.api.common.utils.RequestDataHandler;
 import com.yg.api.common.utils.RequestUtil;
 import com.yg.api.service.BaseApiService;
 import io.restassured.path.json.JsonPath;
 import org.apache.commons.collections4.CollectionUtils;
+import org.junit.platform.commons.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.yg.api.common.enums.UrlEnum.API;
+import static com.yg.api.common.enums.UrlEnum.API_WEB;
 
 /**
  * @ClassName InventoryService
@@ -27,21 +27,25 @@ import static com.yg.api.common.enums.UrlEnum.API;
  */
 @Service
 public class InventoryApiService extends BaseApiService {
-//    @Autowired
-//    PackStockApiService packStockApiService;//Field injection is not recommended
 
     private PackStockApiService packStockApiService;
+    private BatchApiService batchApiService;
 
     @Autowired
     public void setPackStockApiService(PackStockApiService packStockApiService) {
         this.packStockApiService = packStockApiService;
     }
 
+    @Autowired
+    public void setBatchApiService(BatchApiService batchApiService) {
+        this.batchApiService = batchApiService;
+    }
+
     // 查询商品库存
     public JsonPath getSkuStock(List<String> skus, Integer ownerWhId, Integer subWhId) {
         String path = CommonUtil.generateCrossPath(ApiConstant.STOCK, ownerWhId, subWhId);
         JSONObject data = AssemblyInventoryParams.generateGetStockParams(skus);
-        return RequestUtil.sendPost(path, data, API);
+        return RequestUtil.sendPost(path, data, API_WEB);
     }
 
     // 查询商品库存(分仓)
@@ -82,45 +86,46 @@ public class InventoryApiService extends BaseApiService {
      * @param ownerWhId    货主id
      * @param subWhId      有权限的仓库id
      */
-    public HashMap<String, Object> getMultipleStocks(List<String> sku, WhTypeEnum whTypeId, List<Integer> subStorageId, Integer companyId, List<String> bin,
-                                                     List<String> comSku, List<String> batchId, boolean isRefined, Integer ownerWhId, Integer subWhId) {
+    public Map<String, Object> getMultipleStocks(List<String> sku, int whTypeId, List<Integer> subStorageId, Integer companyId, List<String> bin,
+                                                 List<String> comSku, String batchId, boolean isRefined, Integer ownerWhId, Integer subWhId) {
+
         HashMap<String, Object> stockMap = new HashMap<>();
         // 商品库存
-        var stock = getSkuStock(sku, ownerWhId, subWhId);
+        var stock = getSkuStock(sku, ownerWhId, subWhId).getList("data");
 
         // 商品库存(分仓)库存
-        var subStock = getSubWarehouseSkuStock(sku, subStorageId, ownerWhId, subWhId);
+        var subStock = getSubWarehouseSkuStock(sku, subStorageId, ownerWhId, subWhId).getList("ReturnValue.datas");
         stockMap.put("stock", stock);
         stockMap.put("subStock", subStock);
 
         // 暂存位库存
         if (null != companyId) {
-            String tempId = CommonUtil.generateTempId(companyId, whTypeId.getId());
-            var tempStock = packStockApiService.getStockInfo(sku, tempId, batchId);
+            String tempId = CommonUtil.generateTempId(companyId, whTypeId);
+            var tempStock = packStockApiService.getStockInfo(sku, tempId, batchId).getList("ReturnValue.datas");
             stockMap.put("tempStock", tempStock);
         }
+
         // 仓位库存
         if (CollectionUtils.isNotEmpty(bin)) {
             List<String> querySku = CollectionUtils.isNotEmpty(comSku) ? comSku : sku;
             boolean isCombine = CollectionUtils.isNotEmpty(comSku);
-            var binStock = packStockApiService.getStockInfo(querySku, bin, batchId, isCombine);
+            var binStock = packStockApiService.getStockInfo(querySku, bin, batchId, isCombine).getList("ReturnValue.datas");
             stockMap.put("binStock", binStock);
         }
 
         // 组合装库存
         if (CollectionUtils.isNotEmpty(comSku)) {
-            var comStock = getCombSkuStock(comSku, ownerWhId, subWhId);
+            var comStock = getCombSkuStock(comSku, ownerWhId, subWhId).getList("ReturnValue.datas");
             stockMap.put("comStock", comStock);
-
         }
-        // 生产批次库存
-        if (!isRefined && CollectionUtils.isNotEmpty(batchId)) {
-            stockMap.put("batchStock", "batchStock");
 
+        // 生产批次库存
+        if (!isRefined && StringUtils.isNotBlank(batchId)) {
+            var batchStock = batchApiService.getBatchStock(sku, batchId).getList("ReturnValue.datas");
+            stockMap.put("batchStock", batchStock);
         }
 
         return stockMap;
-
     }
 
 
