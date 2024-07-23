@@ -66,7 +66,7 @@ public class InboundDto extends BaseSkuDto {
     // 是否需要箱唯一码
     private boolean needPackSn = false;
     // 是否使用外部箱码
-    private boolean useExternalPackSn = false;
+    private boolean isExternalPackSn = false;
     // 是否需要唯一码/序列号
     private boolean needSn = false;
     // 是否需要单号入库

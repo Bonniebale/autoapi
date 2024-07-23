@@ -3,6 +3,7 @@ package com.yg.api.common;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -17,8 +18,8 @@ public class StockDataVerifyUtil {
      * 生成需要校验的库存数据集合
      *
      * @param originalStock 初始库存
-     * @param currentStock 当前库存
-     * @param qtyAndField 校验字段和数量
+     * @param currentStock  当前库存
+     * @param qtyAndField   校验字段和数量
      */
     public static List<Map<String, Object>> generateVerifyStockData(Map<String, List<Map<String, Object>>> originalStock, Map<String, List<Map<String, Object>>> currentStock,
                                                                     Map<String, Map<String, Integer>> qtyAndField) {
@@ -44,6 +45,22 @@ public class StockDataVerifyUtil {
                         Map.Entry::getKey,
                         Map.Entry::getValue
                 ));
+    }
+
+
+    /**
+     * 根据 批次id + 生产日期 信息过滤
+     */
+    public static List<Map<String, Object>> filterStockByBatch(List<Map<String, Object>> stock, String bathId, String proDate, boolean isFilter) {
+
+        if (!isFilter) {
+            return stock;
+        }
+
+        return stock.stream()
+                .filter(s -> Objects.equals(s.get("batch_id"), bathId) && Objects.equals(s.get("produced_date"), proDate))
+                .collect(Collectors.toList());
+
     }
 
 //    private static Map<String, List<Map<String, Object>>> getStockData(Map<String, List<Map<String, Object>>> stockDatas) {

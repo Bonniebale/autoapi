@@ -21,16 +21,16 @@ import java.util.Map;
 public class PurInboundApiService extends BaseApiService {
 
     // 入库点数、入库装箱
-    public Object createInboundOrder(InboundDto inboundDto, Integer ownerWhId, Integer subWhId) {
+    public JsonPath createInboundOrder(InboundDto inboundDto, Integer ownerWhId, Integer subWhId) {
         String path = CommonUtil.generateCrossPath(ApiConstant.IN_COUNT_ASPX, ownerWhId, subWhId);
         Map<String, Object> params = AssemblyInboundParams.generateInboundParams(inboundDto);
         return RequestUtil.sendPostUrlenc(path, params);
     }
 
     // 创建箱唯一码
-    public JsonPath create_pack_sn() {
+    public String createPackSn() {
         Map<String, Object> params = RequestDataHandler.generateReqParamACall("GetAutoPackSn");
-        return RequestUtil.sendPostUrlenc(ApiConstant.IN_COUNT_ASPX, params);
+        return RequestUtil.sendPostUrlenc(ApiConstant.IN_COUNT_ASPX, params).getString("ReturnValue");
     }
 
 }
