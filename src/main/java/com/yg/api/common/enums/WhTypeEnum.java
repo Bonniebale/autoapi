@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public enum WhTypeEnum {
 
-    DEFAULT(1, "default", "qty"),//主仓
-    RETURN(2, "return", "return_qty"),//销退仓
-    IN(3, "in", "in_qty"),//进货仓
-    DEFECTIVE(4, "defective", "defective_qty"),//次品仓
-    CUSTOMIZE1(6, "customize_1", "customize_qty_1"),//自定义1
-    PICK(100, "pick", "");//拣货仓
+    DEFAULT(1, "default", "qty"),// 主仓
+    RETURN(2, "return", "return_qty"),// 销退仓
+    IN(3, "in", "in_qty"),// 进货仓
+    DEFECTIVE(4, "defective", "defective_qty"),// 次品仓
+    CUSTOMIZE1(6, "customize_1", "customize_qty_1"),// 自定义1
+    PICK(100, "pick", "");// 拣货仓
 
     private final int id;
     private final String type;
@@ -33,8 +33,10 @@ public enum WhTypeEnum {
 
 
     // 根据 id 获取 stockField
-    public static Optional<String> getStockFieldById(int id) {
-        return Optional.ofNullable(ID_TO_ENUM_MAP.get(id)).map(WhTypeEnum::getStockField);
+    public static String getStockFieldById(int id) {
+        return Optional.ofNullable(ID_TO_ENUM_MAP.get(id))
+                .map(WhTypeEnum::getStockField)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid id: " + id));
     }
 
 }

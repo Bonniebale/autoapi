@@ -1,7 +1,6 @@
 package com.yg.api.common;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.junit.platform.commons.util.StringUtils;
+import com.yg.api.common.utils.DataUtil;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -22,7 +21,7 @@ public class DtoBuilder {
 
             // 遍历参数映射，设置对应的 Builder 属性
             paramMap.forEach((key, value) -> {
-                if (isValidValue(value)) {
+                if (DataUtil.isValidValue(value)) {
                     setBuilderProperty(builder, key, value);
                 }
             });
@@ -35,20 +34,6 @@ public class DtoBuilder {
         } catch (Exception e) {
             throw new RuntimeException("实例化失败: " + e.getMessage(), e);
         }
-    }
-
-    // 判断值是否有效
-    public static boolean isValidValue(Object value) {
-        if (value == null) {
-            return false;
-        }
-        if (value instanceof String val) {
-            return StringUtils.isNotBlank(val);
-        }
-        if (value instanceof Collection<?> collection) {
-            return CollectionUtils.isNotEmpty(collection);
-        }
-        return true;
     }
 
     // set

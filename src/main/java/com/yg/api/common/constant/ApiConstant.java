@@ -21,7 +21,7 @@ public class ApiConstant {
     public static final String PURCHASE_ASPX = "/app/scm/purchase/purchasemode.aspx";// 采购单aspx
 
     // 采购入库
-    public static final String GET_PURCHASE_IN_ORDER_DETAIL = "/erp/webapi/WmsApi/purchasein/PurchaseInQuery";// 查询采购入库单
+    public static final String GET_PURCHASE_IN_DETAIL = "/erp/webapi/WmsApi/purchasein/PurchaseInQuery";// 查询采购入库单
     public static final String PURCHASE_IN_ASPX = "/app/scm/purchasein/purchasein.aspx";// 采购入库aspx
     public static final String IN_COUNT_ASPX = "/app/wms/InCount/InCountTrial.aspx";// 采购入库+ 入库点数
 
@@ -32,7 +32,7 @@ public class ApiConstant {
     public static final String CREATE_INVENTORY_TRANSFER = "/erp/webapi/WmsApi/Allocate/CreateAndConfirmAllocateOut";// 创建并审核或确认调拨出
 
     // 唯一码
-    public static final String GET_SN_TRACKING_INFO = "/app/item/TrackingInfo/SkusnTracking.aspx";// 唯一码跟踪-查询
+    public static final String GET_SN_TRACKING_ASPX = "/app/item/TrackingInfo/SkusnTracking.aspx";// 唯一码跟踪-查询
 
     // 生产批次
     public static final String BATCH_ASPX = "/app/wms/batch/batch.aspx";

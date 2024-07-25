@@ -70,11 +70,11 @@ public class ResponseUtil {
         if (isUrlenc) {
             responseData = splitWith01(responseData);
         }
-        JSONObject jsonObject = convertData(responseData);
-        return convertToJsonPath(jsonObject);
+
+        return new JsonPath(JSON.toJSONString(convertData(responseData)));
     }
 
-    //校验响应结果
+    // 校验响应结果
     private static void validateResponse(JSONObject data, boolean isUrlenc) {
         Map<String, String> resultKey = Map.of(
                 "resultCode", isUrlenc ? "IsSuccess" : "code",
@@ -83,17 +83,17 @@ public class ResponseUtil {
                 "data", isUrlenc ? "ReturnValue" : "data"
         );
         var resultCode = data.get(resultKey.get("resultCode"));
-        if (resultCode instanceof Boolean && !(Boolean) resultCode) {
+        if (resultCode instanceof Boolean && !(Boolean)resultCode) {
             // false 抛出异常
 
 
         } else if (resultCode instanceof Integer) {
-            int code = (Integer) resultCode;
+            int code = (Integer)resultCode;
             if (code > 0) {
-                //抛出异常
+                // 抛出异常
             }
             if (code < 0) {
-                //抛出异常
+                // 抛出异常
 
             }
 

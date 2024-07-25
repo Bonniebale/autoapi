@@ -39,11 +39,10 @@ public class CookieUtil {
 
     public static void getCookie(String username, String password) {
         JSONObject body = new JSONObject();
-        JSONObject data = new JSONObject();
-        body.put("data", data);
-        data.put("account", username);
-        data.put("password", password);
-
+        body.put("data", new JSONObject()
+                .fluentPut("account", username)
+                .fluentPut("password", password)
+        );
         var cookies = RequestUtil.doPost(ContentType.JSON, BaseInfo.API_URL + ApiConstant.LOGIN_API, body.toJSONString())
                 .getCookies();
         CookieUtil.cookieString = CookieUtil.formatCookie(cookies);

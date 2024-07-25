@@ -17,8 +17,9 @@ public class AssertionUtil {
     private static final Logger logger = Logger.getLogger(AssertionUtil.class.getName());
 
     // 单条数据断言
-    public static void assertEquals(Object expected, Object actual, String message) {
-        Assert.assertEquals(expected, actual, message);
+    public static void assertEquals(Object expected, Object actual, String message, String field) {
+        String defaultMessage = String.format("%s校验失败, 期望: %s, 实际: %s", field != null ? field : "", expected, actual);
+        Assert.assertEquals(actual, expected, message != null ? message : defaultMessage);
     }
 
     /**
@@ -36,11 +37,11 @@ public class AssertionUtil {
 
         IntStream.range(0, Math.min(initialStock.size(), currentStock.size()))
                 .forEach(i -> fields.forEach((field, qty) -> {
-                    int initialQty = (int)initialStock.get(i).get(field);
-                    int actual = (int)currentStock.get(i).get(field);
-                    int expected = initialQty + qty;
-                    String errorMessage = field + " 校验失败, 期望: " + expected + ", 实际: " + actual;
-                    assertEquals(expected, actual, errorMessage);
+                    Number initialQtyNumber = (Number)initialStock.get(i).get(field);
+                    Number actualNumber = (Number)currentStock.get(i).get(field);
+                    int initialQty = (initialQtyNumber != null) ? initialQtyNumber.intValue() : 0;
+                    int actual = (actualNumber != null) ? actualNumber.intValue() : 0;
+                    assertEquals(initialQty + qty, actual, null, field);
                 }));
     }
 
