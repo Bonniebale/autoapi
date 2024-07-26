@@ -32,7 +32,7 @@ public class SerialNumberApiService extends BaseApiService {
                 )
         );
         var data = RequestDataHandler.generateQueryParams(queryParam);
-        return RequestUtil.sendUrlencJ(ApiConstant.GET_SN_TRACKING_ASPX, data);
+        return RequestUtil.sendPostUrlenc(ApiConstant.GET_SN_TRACKING_ASPX, data);
     }
 
 

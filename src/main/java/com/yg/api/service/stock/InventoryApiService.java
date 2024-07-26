@@ -56,8 +56,8 @@ public class InventoryApiService extends BaseApiService {
                         "wms_co_id", storages
                 )
         );
-        String data = RequestDataHandler.generateQueryParams(queryParam);
-        return RequestUtil.sendUrlencJ(path, data);
+        var data = RequestDataHandler.generateQueryParams(queryParam);
+        return RequestUtil.sendPostUrlenc(path, data);
     }
 
     // 查询组合装库存
@@ -67,8 +67,8 @@ public class InventoryApiService extends BaseApiService {
                         "sku_id", skus
                 )
         );
-        String data = RequestDataHandler.generateQueryParams(queryParam);
-        return RequestUtil.sendUrlencJ(path, data);
+        var data = RequestDataHandler.generateQueryParams(queryParam);
+        return RequestUtil.sendPostUrlenc(path, data);
     }
 
 

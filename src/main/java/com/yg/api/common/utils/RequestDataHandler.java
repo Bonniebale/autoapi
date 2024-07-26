@@ -1,6 +1,6 @@
 package com.yg.api.common.utils;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,9 +16,10 @@ public class RequestDataHandler {
 
     /**
      * ACall1, 参数: [Args] && [CallControl] && 其他参数
-     * @param method method
-     * @param data params
-     * @param dataType 数据类型 1: 有[Args] && [CallControl] 2: 无[CallControl]的基础请求数据 3: 无[Args]的基础请求数据
+     *
+     * @param method    method
+     * @param data      params
+     * @param dataType  数据类型 1: 有[Args] && [CallControl] 2: 无[CallControl] 3: 无[Args]
      * @param otherArgs 其他参数
      */
     public static Map<String, Object> generateReqParamACall(String method, Map<String, Object> data, Integer dataType, Map<String, Object> otherArgs) {
@@ -27,8 +28,6 @@ public class RequestDataHandler {
 
     /**
      * ACall1, 参数: [Args] && [CallControl]
-     * @param method method
-     * @param data params
      */
     public static Map<String, Object> generateReqParamACall(String method, Map<String, Object> data) {
         return generateReqParamACall(method, data, 1, null);
@@ -37,30 +36,37 @@ public class RequestDataHandler {
 
     /**
      * ACall1, 参数: [CallControl]
-     * @param method method
      */
     public static Map<String, Object> generateReqParamACall(String method) {
         return generateReqParamACall(method, null, 3, null);
     }
 
     /**
-     * JTable1
-     * @param method method
-     * @param data params
-     * @param dataType 数据类型 1: 有[Args] && [CallControl] 2: 无[CallControl]的基础请求数据 3: 无[Args]的基础请求数据
+     * JTable1, 参数: [Args] && [CallControl] && 其他参数
+     *
+     * @param method    method
+     * @param data      params
+     * @param dataType  数据类型 1: 有[Args] && [CallControl] 2: 无[CallControl] 3: 无[Args]
      * @param otherArgs 其他参数, 指与[CallBackParam] 同级的参数
      */
     public static Map<String, Object> generateReqParamJTable(String method, List<String> data, Integer dataType, Map<String, Object> otherArgs) {
         return constructRequestData(method, data, "JTable1", dataType, otherArgs);
     }
 
-    // 构造查询参数
-    public static String generateQueryParams(List<Map<String, String>> params) {
+    /**
+     * JTable1, 参数: [Args] && [CallControl]
+     */
+    public static Map<String, Object> generateReqParamJTable(String method, List<String> data, Integer dataType) {
+        return generateReqParamJTable(method, data, dataType, null);
+    }
 
-        return constructCallBackParamData("LoadDataToJSON",
-                List.of("1", JSON.toJSONString(params), "{}"),
-                2
-        );
+
+    /**
+     * 构造查询参数
+     */
+    public static Map<String, Object> generateQueryParams(List<Map<String, String>> params) {
+
+        return generateReqParamJTable("LoadDataToJSON", List.of("1", JSON.toJSONString(params), "{}"), 2);
     }
 
     /**
@@ -69,7 +75,7 @@ public class RequestDataHandler {
      * @param method     方法名称
      * @param params     请求参数
      * @param callBackId 回调ID, ACall1 / JTable1
-     * @param dataType   request数据的结构类型 1: 有[Args] && [CallControl] 2: 无[CallControl]的基础请求数据 3: 无[Args]的基础请求数据
+     * @param dataType   request数据的结构类型 1: 有[Args] && [CallControl] 2: 无[CallControl] 3: 无[Args]
      * @param otherArgs  其他参数, 指与[CallBackParam] 同级的参数
      */
     private static Map<String, Object> constructRequestData(String method, List<String> params, String callBackId, Integer dataType, Map<String, Object> otherArgs) {

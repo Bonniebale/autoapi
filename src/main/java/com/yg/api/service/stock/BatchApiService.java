@@ -37,6 +37,6 @@ public class BatchApiService extends BaseApiService {
                 Map.of("sku_id", sku, "batch_id", batchId)
         );
         var data = RequestDataHandler.generateQueryParams(queryParam);
-        return RequestUtil.sendUrlencJ(ApiConstant.BATCH_STOCK_ASPX, data);
+        return RequestUtil.sendPostUrlenc(ApiConstant.BATCH_STOCK_ASPX, data);
     }
 }

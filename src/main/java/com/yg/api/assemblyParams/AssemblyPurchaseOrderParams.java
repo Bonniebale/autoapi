@@ -3,9 +3,9 @@ package com.yg.api.assemblyParams;
 import com.alibaba.fastjson2.JSONObject;
 import com.yg.api.entity.PurchaseOrderDto;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @ClassName AssemblyPurchaseOrderParams
@@ -56,38 +56,6 @@ public class AssemblyPurchaseOrderParams {
                 // .fluentPut("createPurchases", safeStatus)
         );
         return body;
-    }
-
-    private static <T> Map<String, Object> createSkuQtyMap(Class<T> clazz) throws NoSuchMethodException {
-
-        Method[] declaredMethods = clazz.getDeclaredMethods();
-
-        // 获取指定的方法
-        Method getSku = clazz.getDeclaredMethod("getSku", List.class);
-        Method getQty = clazz.getDeclaredMethod("getQty", int.class);
-
-        Map<String, Object> skuInfo = new HashMap<>();
-        skuInfo.put("skuId", "");
-        skuInfo.put("qty", "");
-
-        Optional.ofNullable(clazz.getBatchId()).ifPresent(batchId -> {
-            skuInfo.put("batchId", batchId);
-            skuInfo.put("producedDate", clazz.getProductionDate());
-            skuInfo.put("expirationDate", clazz.getExpirationDate());
-        });
-        return skuInfo;
-    }
-
-    private static <T> Map<String, Object> createSkuQtyMap(T t) throws NoSuchMethodException, NoSuchFieldException {
-
-
-        Field sku = t.getClass().getDeclaredField("sku");
-        Field qty = t.getClass().getDeclaredField("qty");
-
-        Map<String, Object> skuInfo = new HashMap<>();
-        skuInfo.put("skuId", sku);
-        skuInfo.put("qty", qty);
-        return skuInfo;
     }
 
 }

@@ -81,24 +81,24 @@ public class RequestUtil {
         return ResponseUtil.handleResponseData(response, true);
     }
 
-    public static <T> JsonPath postUrlenc(String path, T data, String callBackId) {
-        Response response = doPostUrlenc(BaseInfo.ERP_URL + path, data, callBackId);
-        return ResponseUtil.handleResponseData(response, true);
-    }
-
-    /**
-     * JTable1 的 post Urlenc 请求
-     */
-    public static JsonPath sendUrlencJ(String path, String jsonStringParam) {
-        return postUrlenc(path, jsonStringParam, "JTable1");
-    }
-
-    /**
-     * ACall1 的 post Urlenc 请求
-     */
-    public static <T> JsonPath sendUrlencA(String path, T data) {
-        return postUrlenc(path, data, "ACall1");
-    }
+//    public static <T> JsonPath postUrlenc(String path, T data, String callBackId) {
+//        Response response = doPostUrlenc(BaseInfo.ERP_URL + path, data, callBackId);
+//        return ResponseUtil.handleResponseData(response, true);
+//    }
+//
+//    /**
+//     * JTable1 的 post Urlenc 请求
+//     */
+//    public static JsonPath sendUrlencJ(String path, String jsonStringParam) {
+//        return postUrlenc(path, jsonStringParam, "JTable1");
+//    }
+//
+//    /**
+//     * ACall1 的 post Urlenc 请求
+//     */
+//    public static <T> JsonPath sendUrlencA(String path, T data) {
+//        return postUrlenc(path, data, "ACall1");
+//    }
 
 
     // 构造UrlEncoded请求body

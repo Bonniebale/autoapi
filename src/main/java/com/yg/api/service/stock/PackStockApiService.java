@@ -51,7 +51,7 @@ public class PackStockApiService extends BaseApiService {
 
         List<Map<String, String>> queryParam = CommonUtil.generateQueryCondition(queryConditions);
         var data = RequestDataHandler.generateQueryParams(queryParam);
-        return RequestUtil.sendUrlencJ(path, data);
+        return RequestUtil.sendPostUrlenc(path, data);
     }
 
     public JsonPath getStockInfo(List<String> skus) {
