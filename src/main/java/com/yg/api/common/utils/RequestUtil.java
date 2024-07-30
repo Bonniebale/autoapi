@@ -70,7 +70,7 @@ public class RequestUtil {
     public static JsonPath sendPost(String path, JSONObject requestBody, UrlEnum urlType) {
         String url = BaseInfo.getUrlByUrlType(urlType);
         Response response = doPost(ContentType.JSON, url + path, requestBody.toJSONString());
-        return ResponseUtil.handleResponseData(response, false);
+        return ResponseUtil.handleResponse(response, false);
     }
 
     /**
@@ -78,7 +78,7 @@ public class RequestUtil {
      */
     public static JsonPath sendPostUrlenc(String url, Map<String, Object> params) {
         Response response = doPost(ContentType.URLENC, BaseInfo.ERP_URL + url, buildUrlEncodedRequestBody(params));
-        return ResponseUtil.handleResponseData(response, true);
+        return ResponseUtil.handleResponse(response, true);
     }
 
 //    public static <T> JsonPath postUrlenc(String path, T data, String callBackId) {
