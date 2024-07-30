@@ -47,6 +47,15 @@ public class PurchaseOrderApiService extends BaseApiService {
      */
     public JsonPath createOrder(PurchaseOrderDto purchaseOrderDto) {
         JSONObject data = AssemblyPurchaseOrderParams.generateCreateOrderParam(purchaseOrderDto);
-        return RequestUtil.sendPost("", data, API);
+        return RequestUtil.sendPost(ApiConstant.CREATE_PURCHASE, data, API);
     }
+
+    /**
+     * 创建并返回采购单id
+     */
+    public Integer getCreateOrderId(PurchaseOrderDto purchaseOrderDto) {
+        return createOrder(purchaseOrderDto).getInt("data.successPoIds[0]");
+    }
+
+
 }

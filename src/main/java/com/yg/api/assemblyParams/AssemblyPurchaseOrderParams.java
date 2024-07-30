@@ -3,9 +3,11 @@ package com.yg.api.assemblyParams;
 import com.alibaba.fastjson2.JSONObject;
 import com.yg.api.entity.PurchaseOrderDto;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName AssemblyPurchaseOrderParams
@@ -42,20 +44,21 @@ public class AssemblyPurchaseOrderParams {
 
     // 创建采购单
     public static JSONObject generateCreateOrderParam(PurchaseOrderDto purchaseOrderDto) {
-        JSONObject body = new JSONObject();
-        ArrayList<JSONObject> paramList = new ArrayList<>();
-        paramList.add(new JSONObject()
+
+        List<Map<String, ? extends Serializable>> skuItems = purchaseOrderDto.getSku().stream()
+                .map(e -> Map.of("skuId", e, "qty", purchaseOrderDto.getQty()))
+                .collect(Collectors.toList());
+
+        JSONObject orderParam = new JSONObject()
                 .fluentPut("wmsCoId", purchaseOrderDto.getCompanyId())
                 .fluentPut("supplierId", purchaseOrderDto.getSupplierId())
-                .fluentPut("items", "自动化")
+                .fluentPut("items", skuItems);
+
+        JSONObject data = new JSONObject()
                 .fluentPut("createFrom", "自动化")
-                .fluentPut("createFrom", "自动化")
-        );
-        body.put("data", new JSONObject()
-                        .fluentPut("createFrom", "自动化")
-                // .fluentPut("createPurchases", safeStatus)
-        );
-        return body;
+                .fluentPut("createPurchases", List.of(orderParam));
+
+        return new JSONObject().fluentPut("data", data);
     }
 
 }

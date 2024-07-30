@@ -45,7 +45,7 @@ public class TestInbound extends BaseTest {
     @DataProvider(name = "inboundParam")
     public static Object[][] inboundParam() {
         return new Object[][]{
-                {"nfsq,milk", "2", "1", "", "", false, true, true},
+                {"nfsq", "2", "1", "po", "", false, false, false},
                 // {"strawberry,milk", "3", "po"}
         };
     }
@@ -161,7 +161,7 @@ public class TestInbound extends BaseTest {
      */
     private Map<String, Map<String, Integer>> generateVerifyField(InboundDto params) {
 
-        var stockField = WhTypeEnum.getStockFieldById(params.getWhTypeId());
+        String stockField = WhTypeEnum.getStockFieldById(params.getWhTypeId());
         Map<String, Integer> fieldAndQty = Map.of(String.valueOf(stockField), params.getQty());
 
         Map<String, Map<String, Integer>> qtyAndField = new HashMap<>();
@@ -186,7 +186,7 @@ public class TestInbound extends BaseTest {
     private void verification(InboundDto inboundDto, Map<String, Object> order, List<Map<String, Object>> verifyStockData) {
 
         // 校验采购入库单字段信息
-        var pioInfo = purInOrderApiService.getOrderInfo((Integer) order.get("ioId"));
+        var pioInfo = purInOrderApiService.getOrderInfo(Collections.singletonList((Integer)order.get("ioId")));
         PIOInfoAssertion.verifyFieldValue(order, pioInfo);
 
         // 校验库存
@@ -195,7 +195,7 @@ public class TestInbound extends BaseTest {
         // 采购单校验
         if (Objects.equals(inboundDto.getInboundType(), "po") && inboundDto.isNeedOrder()) {
             // 明细校验
-            var po_result = purchaseOrderApiService.getOrderDetail(List.of(inboundDto.getPurchaseId()));
+            var po_result = purchaseOrderApiService.getOrderInfo(List.of(inboundDto.getPurchaseId()));
             POInfoAssertion.verifyFieldValue(po_result, order);
         }
 
