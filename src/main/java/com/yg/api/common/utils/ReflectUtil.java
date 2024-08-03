@@ -44,13 +44,13 @@ public class ReflectUtil {
     /**
      * 根据 fieldName set该实例的字段值
      */
-    public static <T> void setFieldValue(T instance, String fieldName, Object value) {
-        handleFieldOperation(instance, fieldName, FieldOperation.SET, value);
+    public static <T> void setFieldValue(T instance, String name, T value) {
+        handleFieldOperation(instance, name, FieldOperation.SET, value);
     }
 
     // 处理字段操作
-    private static <T> Object handleFieldOperation(T instance, String fieldName, FieldOperation operation, Object value) {
-        Field field = getFieldFromClassHierarchy(instance.getClass(), fieldName);
+    private static <T> Object handleFieldOperation(T instance, String name, FieldOperation operation, T value) {
+        Field field = getFieldFromClassHierarchy(instance.getClass(), name);
         field.setAccessible(true);
 
         try {
@@ -71,31 +71,12 @@ public class ReflectUtil {
 
     }
 
-
-    // 枚举字段操作类型
-    private enum FieldOperation {
-        GET, SET
-    }
-
-    /**
-     * 检查值的类型是否与字段的类型兼容
-     */
-    private static boolean isCompatibleType(Field field, Object value) {
-        if (value == null) {
-            return !field.getType().isPrimitive();
-        }
-        return field.getType().isAssignableFrom(value.getClass());
-    }
-
-
-    /**
-     * 在当前类以及父类中查找字段
-     */
-    private static Field getFieldFromClassHierarchy(Class<?> clazz, String fieldName) {
+    // 在当前类以及父类中查找字段
+    private static Field getFieldFromClassHierarchy(Class<?> clazz, String name) {
         // 使用缓存机制和递归查找父类中的字段
         Map<String, Field> fields = fieldCache.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>());
 
-        return fields.computeIfAbsent(fieldName, k -> {
+        return fields.computeIfAbsent(name, k -> {
             Class<?> currentClass = clazz;
             while (currentClass != null) {
                 try {
@@ -109,30 +90,32 @@ public class ReflectUtil {
     }
 
     /**
-     * 设置 Builder 属性
+     * @param instance 对象
+     * @param method 执行方法
+     * @param args 参数
      */
-    public static void setBuilderProperty(Object builder, String fieldName, Object value) {
+    public static <T> Object invokeMethod(T instance, Method method, T args) {
+        method.setAccessible(true);
         try {
-            Method setterMethod = findSetterMethod(builder.getClass(), fieldName);
-            if (setterMethod != null) {
-                setterMethod.setAccessible(true);
-                Object convertedValue = DataUtil.convertValue(value, setterMethod.getParameterTypes()[0]);
-                setterMethod.invoke(builder, convertedValue);
-            } else {
-                throw new RuntimeException("找不到该字段的setter方法: " + fieldName);
-            }
+            return args != null ? method.invoke(instance, args) : method.invoke(instance);
         } catch (Exception e) {
-            throw new RuntimeException("build属性失败: " + e.getMessage(), e);
+            throw new RuntimeException("调用方法失败: " + e.getMessage(), e);
         }
     }
 
+    public static <T> Object invokeMethod(T instance, String methodName, T args) throws NoSuchMethodException {
+        Method method = instance.getClass().getMethod(methodName);// public 的方法
+        // Method method = getMethod(instance.getClass(), methodName, null);
+        return invokeMethod(instance, method, args);
+    }
+
     /**
-     * 查找setter方法
+     * 根据 method name 获取类方法 findMethodInHierarchy
      *
      * @param clazz 类
      * @param methodName 需要查找的方法名
      */
-    public static Method findSetterMethod(Class<?> clazz, String methodName) {
+    public static Method getMethod(Class<?> clazz, String methodName) {
 
         Class<?> currentClass = clazz;
         while (currentClass != null) {
@@ -141,12 +124,45 @@ public class ReflectUtil {
                     .findFirst()
                     .orElse(null);
             if (method != null) {
-                method.setAccessible(true);
                 return method;
             }
             currentClass = currentClass.getSuperclass(); // 继续在父类中查找
         }
-        return null;
+        throw new RuntimeException("找不到该方法: " + methodName);
+    }
+
+    public static Method getMethod(Class<?> clazz, String methodName, Class<?>... paramTypes) {
+        Class<?> currentClass = clazz;
+
+        while (currentClass != null) {
+            Method method = Arrays.stream(currentClass.getDeclaredMethods())
+                    .filter(m -> m.getName().equals(methodName))
+                    // .filter(m -> paramTypes == null ? m.getParameterCount() == paramCount : Arrays.equals(m.getParameterTypes(), paramTypes))
+                    .filter(m -> paramTypes == null || Arrays.equals(m.getParameterTypes(), paramTypes))
+                    .findFirst()
+                    .orElse(null);
+
+            if (method != null) {
+                return method;
+            }
+            currentClass = currentClass.getSuperclass();
+        }
+
+        throw new RuntimeException("找不到该方法: " + methodName);
+    }
+
+
+    // 检查值的类型是否与字段的类型兼容
+    private static boolean isCompatibleType(Field field, Object value) {
+        if (value == null) {
+            return !field.getType().isPrimitive();
+        }
+        return field.getType().isAssignableFrom(value.getClass());
+    }
+
+    // 枚举字段操作类型
+    private enum FieldOperation {
+        GET, SET
     }
 
 

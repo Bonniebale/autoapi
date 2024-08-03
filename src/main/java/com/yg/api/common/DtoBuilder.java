@@ -25,18 +25,25 @@ public class DtoBuilder {
             // 遍历参数映射，设置对应的 Builder 属性
             paramMap.forEach((key, value) -> {
                 if (DataUtil.isValidValue(value)) {
-                    ReflectUtil.setBuilderProperty(builder, key, value);
+                    setFieldProperty(builder, key, value);
                 }
             });
 
             // 调用 build 方法构建对象
-            Method buildMethod = builder.getClass().getMethod("build");
-            buildMethod.setAccessible(true);
-            return (T)buildMethod.invoke(builder);
+            return (T)ReflectUtil.invokeMethod(builder, "build", null);
 
         } catch (Exception e) {
             throw new RuntimeException("实例化失败: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * 设置field属性
+     */
+    public static <T> void setFieldProperty(T instance, String name, T value) {
+        Method method = ReflectUtil.getMethod(instance.getClass(), name);
+        Object convertedValue = DataUtil.convertValue(value, method.getParameterTypes()[0]);
+        ReflectUtil.invokeMethod(instance, method, convertedValue);
     }
 
 
