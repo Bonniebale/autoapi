@@ -1,9 +1,12 @@
 package com.yg.api.common;
 
 import com.yg.api.common.utils.DataUtil;
+import com.yg.api.common.utils.ReflectUtil;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @ClassName DtoBuilder
@@ -22,7 +25,7 @@ public class DtoBuilder {
             // 遍历参数映射，设置对应的 Builder 属性
             paramMap.forEach((key, value) -> {
                 if (DataUtil.isValidValue(value)) {
-                    setBuilderProperty(builder, key, value);
+                    ReflectUtil.setBuilderProperty(builder, key, value);
                 }
             });
 
@@ -36,40 +39,6 @@ public class DtoBuilder {
         }
     }
 
-    // set
-    public static void setBuilderProperty(Object builder, String fieldName, Object value) {
-        try {
-            Method setterMethod = findSetterMethod(builder.getClass(), fieldName);
-            if (setterMethod != null) {
-                setterMethod.setAccessible(true);
-                Object convertedValue = convertValue(value, setterMethod.getParameterTypes()[0]);
-                setterMethod.invoke(builder, convertedValue);
-            } else {
-                throw new RuntimeException("找不到该字段的setter方法: " + fieldName);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("build属性失败: " + e.getMessage(), e);
-        }
-    }
-
-    // 查找setter方法
-    public static Method findSetterMethod(Class<?> builderClass, String fieldName) {
-        Class<?> currentClass = builderClass;
-
-        while (currentClass != null) {
-            Method method = Arrays.stream(currentClass.getDeclaredMethods())
-                    .filter(m -> m.getName().equals(fieldName) && m.getParameterCount() == 1)
-                    .findFirst()
-                    .orElse(null);
-            if (method != null) {
-                method.setAccessible(true);
-                return method;
-            }
-            currentClass = currentClass.getSuperclass(); // 继续在父类中查找
-        }
-
-        return null;
-    }
 
     private static Optional<Method> findMethod(Method[] methods, String setterName, Class<?> valueType) {
         for (Method method : methods) {
@@ -85,29 +54,6 @@ public class DtoBuilder {
         }
         return Optional.empty();
     }
-
-    /**
-     * 转换值
-     *
-     * @param value 值
-     * @param targetType 目标类型
-     */
-    private static Object convertValue(Object value, Class<?> targetType) {
-        if (targetType.isInstance(value)) {
-            return value;
-        }
-        if (targetType == Integer.class || targetType == int.class) {
-            return Integer.parseInt(value.toString());
-        }
-        if (targetType == Boolean.class || targetType == boolean.class) {
-            return Boolean.parseBoolean(value.toString());
-        }
-        if (targetType == List.class && value instanceof String) {
-            return Arrays.asList(((String)value).split(","));
-        }
-        throw new IllegalArgumentException("Unsupported target type: " + targetType);
-    }
-
 
     private static Class<?> wrapperType(Class<?> primitiveType) {
         if (primitiveType == int.class) return Integer.class;

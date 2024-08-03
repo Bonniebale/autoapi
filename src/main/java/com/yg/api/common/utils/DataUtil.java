@@ -3,9 +3,7 @@ package com.yg.api.common.utils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.platform.commons.util.StringUtils;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @ClassName DataUtil
@@ -29,6 +27,28 @@ public class DataUtil {
             return CollectionUtils.isNotEmpty(collection);
         }
         return true;
+    }
+
+    /**
+     * 转换值
+     *
+     * @param value 值
+     * @param targetType 目标类型
+     */
+    public static Object convertValue(Object value, Class<?> targetType) {
+        if (targetType.isInstance(value)) {
+            return value;
+        }
+        if (targetType == Integer.class || targetType == int.class) {
+            return Integer.parseInt(value.toString());
+        }
+        if (targetType == Boolean.class || targetType == boolean.class) {
+            return Boolean.parseBoolean(value.toString());
+        }
+        if (targetType == List.class && value instanceof String) {
+            return Arrays.asList(((String)value).split(","));
+        }
+        throw new IllegalArgumentException("Unsupported target type: " + targetType);
     }
 
     @SafeVarargs
